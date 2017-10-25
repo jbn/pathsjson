@@ -70,7 +70,7 @@ class TestPathsJSONFunctions(unittest.TestCase):
 
     def test_path_defs_from(self):
         expected = {('a', 'A'), ('b', 'B')}
-        result = path_defs_from({'ENV': {}, 'a': 'A', 'b': 'B'})
+        result = path_defs_from({'__ENV': {}, 'a': 'A', 'b': 'B'})
         self.assertEqual(set(result), expected)
 
     def test_to_adjacency_list(self):
@@ -145,7 +145,7 @@ class TestPathsJSONFunctions(unittest.TestCase):
         with override_env(VERSION='3.1.4', raw_dir='/root'):
             data = patch_with_env(raw)
             self.assertEqual(os.environ['raw_dir'], '/root')
-            self.assertEqual(data['ENV']['VERSION'], '3.1.4')
+            self.assertEqual(data['__ENV']['VERSION'], '3.1.4')
             self.assertEqual(data['raw_dir'], '/root')
 
     def test_create_user_globals_file(self):
@@ -164,7 +164,7 @@ class TestPathsJSONFunctions(unittest.TestCase):
             with self.assertRaisesRegexp(OSError, "User globals missing"):
                 patch_with_user_globals({}, skip_noexist=False)
 
-            expected = {'ENV': {'ME': 'JBN'}, 'EXTRAS': '/extras'}
+            expected = {'__ENV': {'ME': 'JBN'}, 'EXTRAS': '/extras'}
             create_user_globals_file()
             with open(path, 'w') as fp:
                 json.dump(expected, fp)
@@ -202,7 +202,7 @@ class TestPathsJSON(unittest.TestCase):
 
     def test_implicit_root(self):
         expected = FIXTURES_DIR
-        self.assertEqual(self.PATHS._src['ENV']['_IMPLICIT_ROOT'],
+        self.assertEqual(self.PATHS._src['__ENV']['_IMPLICIT_ROOT'],
                          FIXTURES_DIR)
 
 

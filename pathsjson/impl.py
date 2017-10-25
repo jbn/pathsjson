@@ -15,9 +15,9 @@ def is_simple_var(s):
 def path_defs_from(d):
     """
     :param d: ``.paths.json`` data structure
-    :return: all path definitions without any special entries like `ENV`
+    :return: all path definitions without any special entries like `__ENV`
     """
-    return [p for p in d.items() if p[0] != 'ENV']
+    return [p for p in d.items() if p[0] != '__ENV']
 
 
 def to_adjacency_list(d):
@@ -70,8 +70,8 @@ def expand(data):
 
     g = to_adjacency_list(data)
     deps = to_dependents_list(g)
-    ks = topo_sort(g, data['ENV'])
-    ns = data.pop('ENV', {})
+    ks = topo_sort(g, data['__ENV'])
+    ns = data.pop('__ENV', {})
     expansion = {}
 
     for k in ks:
@@ -135,8 +135,8 @@ def find_file_asc(src_dir=None, target_name=".paths.json", limit=None):
 
 def patch_with_env(data):
     for k, v in os.environ.items():
-        if k in data['ENV']:
-            data['ENV'][k] = v
+        if k in data['__ENV']:
+            data['__ENV'][k] = v
         elif k in data:
             data[k] = v
     return data
@@ -173,12 +173,12 @@ def patch_with_user_globals(data, skip_noexist=True):
     with open(file_path) as fp:
         global_data = json.load(fp)
 
-    env_updates = global_data.pop('ENV', None)
+    env_updates = global_data.pop('__ENV', None)
     if env_updates:
-        if 'ENV' not in data:
-            data['ENV'] = env_updates
+        if '__ENV' not in data:
+            data['__ENV'] = env_updates
         else:
-            data['ENV'].update(env_updates)
+            data['__ENV'].update(env_updates)
 
     data.update(global_data)
 
@@ -198,8 +198,8 @@ class PathsJSON:
         with open(file_path) as fp:
             data = json.load(fp)
 
-            if 'ENV' not in data:
-                data['ENV'] = {}
+            if '__ENV' not in data:
+                data['__ENV'] = {}
 
             if enable_user_global_overrides:
                 data = patch_with_user_globals(data)
@@ -207,8 +207,9 @@ class PathsJSON:
             if enable_env_overrides:
                 data = patch_with_env(data)
 
-            if add_implicit_root and '_IMPLICIT_ROOT' not in data['ENV']:
-                data['ENV']['_IMPLICIT_ROOT'] = os.path.abspath(os.path.dirname(file_path))
+            if add_implicit_root and '_IMPLICIT_ROOT' not in data['__ENV']:
+                implicit_root = os.path.abspath(os.path.dirname(file_path))
+                data['__ENV']['_IMPLICIT_ROOT'] = implicit_root
 
             self._src = data
             self._path_strs = to_path_strs(expand(data))
@@ -253,9 +254,6 @@ class PathsJSON:
             except ValueError:  # Missing non-default arg
                 pass
         return paths
-
-
-
 
     def _ipython_key_completions_(self):
         return list(self._path_strs)

@@ -16,7 +16,7 @@
         "$data_dir",
         "tests"
     ],
-    "ENV": {
+    "__ENV": {
         "VERSION": "1.0.0"
     },
     "data_dir": [
