@@ -14,7 +14,7 @@ def is_simple_var(s):
 
 def path_defs_from(d):
     """
-    :param d: paths.json data structure
+    :param d: ``.paths.json`` data structure
     :return: all path definitions without any special entries like `ENV`
     """
     return [p for p in d.items() if p[0] != 'ENV']
@@ -109,7 +109,7 @@ def to_path_strs(expansion):
     return path_strs
 
 
-def find_file_asc(src_dir=None, target_name="paths.json", limit=None):
+def find_file_asc(src_dir=None, target_name=".paths.json", limit=None):
     """
     Walk file system towards root in search of the first target.
 
@@ -143,7 +143,7 @@ def patch_with_env(data):
 
 
 def get_user_globals_path():
-    return os.path.join(appdirs.user_data_dir('pathsjson'), "paths.json")
+    return os.path.join(appdirs.user_data_dir('pathsjson'), ".paths.json")
 
 
 def create_user_globals_file(overwrite=False):
@@ -187,7 +187,7 @@ def patch_with_user_globals(data, skip_noexist=True):
 
 class PathsJSON:
 
-    def __init__(self, file_path=None, src_dir=None, target_name="paths.json",
+    def __init__(self, file_path=None, src_dir=None, target_name=".paths.json",
                  enable_env_overrides=True, enable_user_global_overrides=True,
                  add_implicit_root=True):
         if file_path is None:
