@@ -29,8 +29,27 @@ SAMPLE_DATA = json.load(open(SAMPLE_PATH))
 def override_env(**kwargs):
     old_env = copy.deepcopy(os.environ)
     os.environ = kwargs
-    yield
-    os.environ = kwargs
+    try:
+        yield
+    finally:
+        os.environ = kwargs
+
+@contextmanager
+def delete_and_replace(path):
+    if os.path.exists(path):
+        with open(path) as fp:
+            src = fp.read()
+        os.unlink(path)
+        try:
+            yield
+        finally:
+            with open(path, "w") as fp:
+                fp.write(src)
+    else:
+        yield
+
+
+
 
 
 ###############################################################################
@@ -129,12 +148,36 @@ class TestPathsJSONFunctions(unittest.TestCase):
             self.assertEqual(data['ENV']['VERSION'], '3.1.4')
             self.assertEqual(data['raw_dir'], '/root')
 
+    def test_create_user_globals_file(self):
+        path = get_user_globals_path()
+
+        with delete_and_replace(path):
+            create_user_globals_file()
+            self.assertTrue(os.path.exists(path))
+            with self.assertRaisesRegexp(RuntimeError, "Will not"):
+                create_user_globals_file()
+
+    def test_patch_with_user_globals(self):
+        path = get_user_globals_path()
+
+        with delete_and_replace(path):
+            with self.assertRaisesRegexp(OSError, "User globals missing"):
+                patch_with_user_globals({}, skip_noexist=False)
+
+            expected = {'ENV': {'ME': 'JBN'}, 'EXTRAS': '/extras'}
+            create_user_globals_file()
+            with open(path, 'w') as fp:
+                json.dump(expected, fp)
+
+            self.assertEqual(patch_with_user_globals({}), expected)
+
 
 class TestPathsJSON(unittest.TestCase):
 
     def setUp(self):
         self.PATHS = PathsJSON(src_dir=FIXTURES_DIR,
-                               target_name="sample.paths.json")
+                               target_name="sample.paths.json",
+                               enable_user_global_overrides=False)
 
     def test_simple_path(self):
         self.assertEqual(self.PATHS['clean_dir'],

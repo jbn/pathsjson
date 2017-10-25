@@ -1,3 +1,4 @@
+import appdirs
 import copy
 import json
 import os
@@ -141,10 +142,54 @@ def patch_with_env(data):
     return data
 
 
+def get_user_globals_path():
+    return os.path.join(appdirs.user_data_dir('pathsjson'), "paths.json")
+
+
+def create_user_globals_file(overwrite=False):
+    file_path = get_user_globals_path()
+
+    if not overwrite and os.path.exists(file_path):
+        raise RuntimeError("Will not overwrite: {}".format(file_path))
+
+    dir_path = os.path.dirname(file_path)
+
+    try:
+        os.makedirs(dir_path)
+    except OSError:
+        pass
+
+    with open(file_path, 'w') as fp:
+        json.dump({}, fp)
+
+    return file_path
+
+
+def patch_with_user_globals(data, skip_noexist=True):
+    file_path = get_user_globals_path()
+    if not skip_noexist and not os.path.exists(file_path):
+        raise OSError("User globals missing at: ".format(file_path))
+
+    with open(file_path) as fp:
+        global_data = json.load(fp)
+
+    env_updates = global_data.pop('ENV', None)
+    if env_updates:
+        if 'ENV' not in data:
+            data['ENV'] = env_updates
+        else:
+            data['ENV'].update(env_updates)
+
+    data.update(global_data)
+
+    return data
+
+
 class PathsJSON:
 
     def __init__(self, file_path=None, src_dir=None, target_name="paths.json",
-                 enable_env_overrides=True, add_implicit_root=True):
+                 enable_env_overrides=True, enable_user_global_overrides=True,
+                 add_implicit_root=True):
         if file_path is None:
             file_path = find_file_asc(src_dir, target_name)
             if file_path is None:
@@ -155,6 +200,9 @@ class PathsJSON:
 
             if 'ENV' not in data:
                 data['ENV'] = {}
+
+            if enable_user_global_overrides:
+                data = patch_with_user_globals(data)
 
             if enable_env_overrides:
                 data = patch_with_env(data)
