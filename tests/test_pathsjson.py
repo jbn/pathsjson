@@ -191,8 +191,12 @@ class TestPathsJSON(unittest.TestCase):
         self.assertEqual(self.PATHS['latest_data', '2.1.3'],
                          os.path.join("data", "raw", "2.1.3", "data.csv"))
 
-    def test_resolve_kw_override(self):
-        self.assertEqual(self.PATHS.resolve('latest_data', VERSION='99'),
+    def test_resolve_path_kw_override(self):
+        self.assertEqual(self.PATHS.resolve_path('latest_data', VERSION='99'),
+                         os.path.join("data", "raw", "99", "data.csv"))
+
+    def test_resolve(self):
+        self.assertEqual(self.PATHS.resolve('latest_data', VERSION='99').path,
                          os.path.join("data", "raw", "99", "data.csv"))
 
     def test_repr(self):

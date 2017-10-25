@@ -3,6 +3,7 @@ import copy
 import json
 import jsonschema
 import os
+from contextlib import contextmanager
 
 
 SCHEMA_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),
@@ -228,9 +229,9 @@ class PathsJSON:
         else:
             k, args = args, tuple()
 
-        return self.resolve(k, *args)
+        return self.resolve_path(k, *args)
 
-    def resolve(self, k, *args, **kwargs):
+    def resolve_path(self, k, *args, **kwargs):
         # Raises a lookup error which is a reasonable.
         path, var_names, defaults = self._path_strs.get(k)
 
@@ -253,12 +254,15 @@ class PathsJSON:
 
         return path.format(*path_args)
 
+    def resolve(self, k, *args, **kwargs):
+        return Resolution(self.resolve_path(k, *args, **kwargs))
+
     @property
     def all_resolvable_paths(self):
         paths = {}
         for k in self._path_strs:
             try:
-                paths[k] = self.resolve(k)
+                paths[k] = self.resolve_path(k)
             except ValueError:  # Missing non-default arg
                 pass
         return paths
@@ -269,3 +273,28 @@ class PathsJSON:
     def __repr__(self):
         ks = sorted(list(self._path_strs))
         return "PathsJSON(KEYS=[{}])".format(", ".join(ks))
+
+
+class Resolution:
+    def __init__(self, path):
+        self._path = path
+
+    @property
+    def path(self):
+        return self._path
+
+    @contextmanager
+    def open(self, *args, **kwargs):
+        """
+        Opens the file and automatically creates the directory if nessessary.
+        """
+        dir_path = os.path.dirname(self._path)
+
+        if not os.path.exists(dir_path):
+            try:
+                os.makedirs(dir_path)
+            except OSError:
+                pass
+
+        with open(self._path, *args, **kwargs) as fp:
+            yield fp
