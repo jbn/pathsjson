@@ -131,16 +131,34 @@ def find_file_asc(src_dir=None, target_name="paths.json", limit=None):
         if limit is not None:
             limit -= 1
 
+
+def patch_with_env(data):
+    for k, v in os.environ.items():
+        if k in data['ENV']:
+            data['ENV'][k] = v
+        elif k in data:
+            data[k] = v
+    return data
+
+
 class PathsJSON:
 
-    def __init__(self, file_path=None, src_dir=None, target_name="paths.json"):
+    def __init__(self, file_path=None, src_dir=None, target_name="paths.json",
+                 enable_env_overrides=True):
         if file_path is None:
             file_path = find_file_asc(src_dir, target_name)
             if file_path is None:
                 raise RuntimeError("No `{}` file found!".format(target_name))
 
         with open(file_path) as fp:
-            self._path_strs = to_path_strs(expand(json.load(fp)))
+            data = json.load(fp)
+            if enable_env_overrides:
+                data = patch_with_env(data)
+
+            if enable_env_overrides:
+                pass
+
+            self._path_strs = to_path_strs(expand(data))
 
     def __getitem__(self, args):
         if isinstance(args, tuple):

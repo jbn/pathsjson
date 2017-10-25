@@ -1,6 +1,9 @@
+import copy
 import json
 import os
 import unittest
+from contextlib import contextmanager
+
 from pathsjson.impl import *
 
 
@@ -18,6 +21,17 @@ MOCK_LEAF = os.path.join(SELF_DIR, "mock", "directory", "path")
 SAMPLE_PATH = os.path.join(FIXTURES_DIR, "sample.paths.json")
 
 SAMPLE_DATA = json.load(open(SAMPLE_PATH))
+
+###############################################################################
+
+
+@contextmanager
+def override_env(**kwargs):
+    old_env = copy.deepcopy(os.environ)
+    os.environ = kwargs
+    yield
+    os.environ = kwargs
+
 
 ###############################################################################
 
@@ -106,6 +120,15 @@ class TestPathsJSONFunctions(unittest.TestCase):
         rand_name = uuid.uuid4().hex
         self.assertIsNone(find_file_asc(MOCK_LEAF, rand_name))
 
+    def test_patch_with_env(self):
+        raw = copy.deepcopy(SAMPLE_DATA)
+
+        with override_env(VERSION='3.1.4', raw_dir='/root'):
+            data = patch_with_env(raw)
+            self.assertEqual(os.environ['raw_dir'], '/root')
+            self.assertEqual(data['ENV']['VERSION'], '3.1.4')
+            self.assertEqual(data['raw_dir'], '/root')
+
 
 class TestPathsJSON(unittest.TestCase):
 
@@ -133,6 +156,8 @@ class TestPathsJSON(unittest.TestCase):
         expected = ("PathsJSON(KEYS=[clean_dir, codebook_dir, data_dir, "
                    "latest_data, raw_dir, test_dir])")
         self.assertEqual(repr(self.PATHS), expected)
+
+
 
 if __name__ == '__main__':
     unittest.main()
