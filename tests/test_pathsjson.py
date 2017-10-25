@@ -1,16 +1,27 @@
 import json
 import os
 import unittest
-from pathsjson.pathsjson import *
+from pathsjson.impl import *
 
+
+###############################################################################
+# With some self-referential comedy, this is exactly the type of header that 
+# paths.json removes from your code.
+###############################################################################
 
 SELF_DIR = os.path.dirname(os.path.abspath(__file__))
 
 FIXTURES_DIR = os.path.join(SELF_DIR, "fixtures")
 
-SAMPLE_DATA = json.load(open(os.path.join(FIXTURES_DIR, "sample.paths.json")))
+MOCK_LEAF = os.path.join(SELF_DIR, "mock", "directory", "path")
 
-class TestPathsJson(unittest.TestCase):
+SAMPLE_PATH = os.path.join(FIXTURES_DIR, "sample.paths.json")
+
+SAMPLE_DATA = json.load(open(SAMPLE_PATH))
+
+###############################################################################
+
+class TestPathsJSONFunctions(unittest.TestCase):
 
     def test_is_env_var(self):
         self.assertFalse(is_env_var("$CLEAN_DIR"))
@@ -86,16 +97,42 @@ class TestPathsJson(unittest.TestCase):
         self.assertEqual(path_strs, expected)
 
     def test_find_pathsjson_file_asc(self):
-        mock_leaf = os.path.join(SELF_DIR, "mock", "directory", "path")
-        res = find_file_asc(mock_leaf, "test_target")
+        res = find_file_asc(MOCK_LEAF, "test_target")
         self.assertTrue(res.endswith("test_target"))
-        self.assertIsNone(find_file_asc(mock_leaf, "test_target", 1))
+        self.assertIsNone(find_file_asc(MOCK_LEAF, "test_target", 1))
 
         # Check that it stops at root.
         import uuid
         rand_name = uuid.uuid4().hex
-        self.assertIsNone(find_file_asc(mock_leaf, rand_name))
+        self.assertIsNone(find_file_asc(MOCK_LEAF, rand_name))
 
+
+class TestPathsJSON(unittest.TestCase):
+
+    def setUp(self):
+        self.PATHS = PathsJSON(src_dir=FIXTURES_DIR,
+                               target_name="sample.paths.json")
+
+    def test_simple_path(self):
+        self.assertEqual(self.PATHS['clean_dir'],
+                         os.path.join("data", "clean"))
+
+    def test_default_interpolation(self):
+        self.assertEqual(self.PATHS['latest_data'],
+                         os.path.join("data", "raw", "1.0.0", "data.csv"))
+
+    def test_arg_override(self):
+        self.assertEqual(self.PATHS['latest_data', '2.1.3'],
+                         os.path.join("data", "raw", "2.1.3", "data.csv"))
+
+    def test_resolve_kw_override(self):
+        self.assertEqual(self.PATHS.resolve('latest_data', VERSION='99'),
+                         os.path.join("data", "raw", "99", "data.csv"))
+
+    def test_repr(self):
+        expected = ("PathsJSON(KEYS=[clean_dir, codebook_dir, data_dir, "
+                   "latest_data, raw_dir, test_dir])")
+        self.assertEqual(repr(self.PATHS), expected)
 
 if __name__ == '__main__':
     unittest.main()

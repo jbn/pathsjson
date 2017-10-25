@@ -1,4 +1,5 @@
 import copy
+import json
 import os
 
 
@@ -130,3 +131,51 @@ def find_file_asc(src_dir=None, target_name="paths.json", limit=None):
         if limit is not None:
             limit -= 1
 
+class PathsJSON:
+
+    def __init__(self, file_path=None, src_dir=None, target_name="paths.json"):
+        if file_path is None:
+            file_path = find_file_asc(src_dir, target_name)
+            if file_path is None:
+                raise RuntimeError("No `{}` file found!".format(target_name))
+
+        with open(file_path) as fp:
+            self._path_strs = to_path_strs(expand(json.load(fp)))
+
+    def __getitem__(self, args):
+        if isinstance(args, tuple):
+            k, args = args[0], args[1:]
+        else:
+            k, args = args, tuple()
+
+        return self.resolve(k, *args)
+
+    def resolve(self, k, *args, **kwargs):
+        # Raises a lookup error which is a reasonable.
+        path, var_names, defaults = self._path_strs.get(k)
+
+        if not var_names:
+            return path
+
+        args, path_args = list(args), []
+        for name, default in zip(var_names, defaults):
+            if name in kwargs:
+                path_args.append(kwargs.pop(name))
+            else:
+                if not args:
+                    if default is None:
+                        expected = ", ".join(var_names)
+                        raise ValueError("Expected args: {}".format(expected))
+                    else:
+                        path_args.append(default)
+                else:
+                    path_args.append(args.pop(0))
+
+        return path.format(*path_args)
+
+    def _ipython_key_completions_(self):
+        return list(self._path_strs)
+
+    def __repr__(self):
+        ks = sorted(list(self._path_strs))
+        return "PathsJSON(KEYS=[{}])".format(", ".join(ks))
