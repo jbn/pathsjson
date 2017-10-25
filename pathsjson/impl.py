@@ -1,7 +1,12 @@
 import appdirs
 import copy
 import json
+import jsonschema
 import os
+
+
+SCHEMA_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                           "schema.json")
 
 
 def is_env_var(s):
@@ -189,7 +194,7 @@ class PathsJSON:
 
     def __init__(self, file_path=None, src_dir=None, target_name=".paths.json",
                  enable_env_overrides=True, enable_user_global_overrides=True,
-                 add_implicit_root=True):
+                 add_implicit_root=True, validate=True):
         if file_path is None:
             file_path = find_file_asc(src_dir, target_name)
             if file_path is None:
@@ -211,6 +216,9 @@ class PathsJSON:
                 implicit_root = os.path.abspath(os.path.dirname(file_path))
                 data['__ENV']['_IMPLICIT_ROOT'] = implicit_root
 
+            if validate:
+                with open(SCHEMA_FILE) as fp:
+                    jsonschema.validate(data, json.load(fp))
             self._src = data
             self._path_strs = to_path_strs(expand(data))
 

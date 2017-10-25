@@ -1,0 +1,21 @@
+{
+    "id": "http://pathsjson.falsifiable.com/pathsjson-schema#",
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "description": "A schema for paths.json files.",
+    "title": "paths.json",
+    "type": "object",
+    "properties": {
+        "__ENV": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {"type": "string"}
+            }
+        }
+    },
+    "patternProperties": {
+        "^(?!__ENV)": {
+            "type": "array",
+            "items": {"type": "string"}
+        }
+    }
+}

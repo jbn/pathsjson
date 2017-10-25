@@ -25,7 +25,7 @@ CLASSIFIERS = ["Development Status :: 3 - Alpha",
                "Programming Language :: Python :: 3.4",
                "Programming Language :: Python :: 3.5"]
 
-INSTALL_REQUIRES = ['appdirs']
+INSTALL_REQUIRES = ['appdirs', 'jsonschema']
 
 ##############################################################################
 
@@ -59,8 +59,8 @@ if __name__ == "__main__":
         keywords=KEYWORDS,
         long_description=read_file_safely("README.rst"),
         packages=PACKAGES,
-        package_dir={"": "."},
-        package_data={},
+        package_dir={"pathsjson": "pathsjson"},
+        package_data={"pathsjson": ["pathsjson/*.json"]},
         entry_points={'console_scripts': ['pathsjson = pathsjson.cli:main']},
         include_package_data=True,
         classifiers=CLASSIFIERS,
