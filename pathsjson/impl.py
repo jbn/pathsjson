@@ -244,6 +244,19 @@ class PathsJSON:
 
         return path.format(*path_args)
 
+    @property
+    def all_resolvable_paths(self):
+        paths = {}
+        for k in self._path_strs:
+            try:
+                paths[k] = self.resolve(k)
+            except ValueError:  # Missing non-default arg
+                pass
+        return paths
+
+
+
+
     def _ipython_key_completions_(self):
         return list(self._path_strs)
 

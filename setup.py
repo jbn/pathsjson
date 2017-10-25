@@ -61,6 +61,7 @@ if __name__ == "__main__":
         packages=PACKAGES,
         package_dir={"": "."},
         package_data={},
+        entry_points={'console_scripts': ['pathsjson = pathsjson.cli:main']},
         include_package_data=True,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
