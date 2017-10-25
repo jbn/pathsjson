@@ -157,6 +157,11 @@ class TestPathsJSON(unittest.TestCase):
                    "latest_data, raw_dir, test_dir])")
         self.assertEqual(repr(self.PATHS), expected)
 
+    def test_implicit_root(self):
+        expected = FIXTURES_DIR
+        self.assertEqual(self.PATHS._src['ENV']['_IMPLICIT_ROOT'],
+                         FIXTURES_DIR)
+
 
 
 if __name__ == '__main__':

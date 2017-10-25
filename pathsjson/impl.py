@@ -144,7 +144,7 @@ def patch_with_env(data):
 class PathsJSON:
 
     def __init__(self, file_path=None, src_dir=None, target_name="paths.json",
-                 enable_env_overrides=True):
+                 enable_env_overrides=True, add_implicit_root=True):
         if file_path is None:
             file_path = find_file_asc(src_dir, target_name)
             if file_path is None:
@@ -152,12 +152,17 @@ class PathsJSON:
 
         with open(file_path) as fp:
             data = json.load(fp)
+
+            if 'ENV' not in data:
+                data['ENV'] = {}
+
             if enable_env_overrides:
                 data = patch_with_env(data)
 
-            if enable_env_overrides:
-                pass
+            if add_implicit_root and '_IMPLICIT_ROOT' not in data['ENV']:
+                data['ENV']['_IMPLICIT_ROOT'] = os.path.abspath(os.path.dirname(file_path))
 
+            self._src = data
             self._path_strs = to_path_strs(expand(data))
 
     def __getitem__(self, args):
