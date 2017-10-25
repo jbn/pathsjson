@@ -1,3 +1,4 @@
+import json
 import os
 import unittest
 from pathsjson.pathsjson import *
@@ -5,14 +6,9 @@ from pathsjson.pathsjson import *
 
 SELF_DIR = os.path.dirname(os.path.abspath(__file__))
 
-SAMPLE_DATA = {"ENV": {"VERSION": "1.0.0"},
-               "data_dir": ["data"],
-               "raw_dir": ["$data_dir", "raw"],
-               "test_dir": ["$data_dir", "tests"],
-               "clean_dir": ["$data_dir", "clean"],
-               "codebook_dir": ["$clean_dir", "codebooks"],
-               "latest_data": ["$raw_dir", "$$VERSION", "data.csv"]}
+FIXTURES_DIR = os.path.join(SELF_DIR, "fixtures")
 
+SAMPLE_DATA = json.load(open(os.path.join(FIXTURES_DIR, "sample.paths.json")))
 
 class TestPathsJson(unittest.TestCase):
 
