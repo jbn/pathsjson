@@ -258,6 +258,10 @@ class TestPathsJSON(unittest.TestCase):
         with self.assertRaises(KeyError):
             self.PATHS['missing']
 
+    def test_with_null_defaults(self):
+        PATHS = PathsJSON(src_dir=FIXTURES_DIR,
+                          target_name="paths_with_null_default.json")
+
 
 if __name__ == '__main__':
     unittest.main()

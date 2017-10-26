@@ -1,0 +1,4 @@
+{
+    "__ENV": { "VERSION": null },
+    "special": ["root", "$$VERSION", "$$user_name"]
+}

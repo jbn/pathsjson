@@ -8,7 +8,7 @@
         "__ENV": {
             "type": "object",
             "patternProperties": {
-                ".*": {"type": "string"}
+                ".*": {"type": ["null", "string"]}
             }
         }
     },
