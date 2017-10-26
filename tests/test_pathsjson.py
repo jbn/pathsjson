@@ -3,6 +3,7 @@ import json
 import os
 import uuid
 import unittest
+import platform
 from contextlib import contextmanager
 
 from pathsjson.impl import *
@@ -127,6 +128,18 @@ class TestPathsJSONFunctions(unittest.TestCase):
                     "raw_dir": (os.path.join("data", "raw"), [], []),
                     "test_dir": (os.path.join("data", "tests"), [], [])}
         self.assertEqual(path_strs, expected)
+
+    def test_root_paths(self):
+        data = {"__ENV": {}, "user_bin": ["$$_DRIVE_ROOT", "usr", "bin"]}
+        inject_special_variables(data, FIXTURES_DIR)
+        path_strs = to_path_strs(expand(data))
+        path = resolve_path(path_strs, 'user_bin')
+
+        # This test is fragile.
+        if platform.system().lower() == 'windows':
+            self.assertEqual(path.lower(), r"c:\usr\bin")
+        else:
+            self.assertEqual(path, '//usr/bin')
 
     def test_find_pathsjson_file_asc(self):
         res = find_file_asc(MOCK_LEAF, "test_target")

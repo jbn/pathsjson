@@ -196,6 +196,42 @@ def patch_with_user_globals(data, skip_noexist=True):
     return data
 
 
+def inject_special_variables(data, file_path):
+    env = data['__ENV']
+
+    if '_IMPLICIT_ROOT' not in env:
+        env['_IMPLICIT_ROOT'] = os.path.abspath(os.path.dirname(file_path))
+
+    if '_DRIVE_ROOT' not in env:
+        env['_DRIVE_ROOT'] = os.path.abspath(os.sep)
+
+    return data
+
+
+def resolve_path(path_strs, k, *args, **kwargs):
+    # Raises a key error which is a reasonable.
+    path, var_names, defaults = path_strs[k]
+
+    if not var_names:
+        return path
+
+    args, path_args = list(args), []
+    for name, default in zip(var_names, defaults):
+        if name in kwargs:
+            path_args.append(kwargs.pop(name))
+        else:
+            if not args:
+                if default is None:
+                    expected = ", ".join(var_names)
+                    raise ValueError("Expected args: {}".format(expected))
+                else:
+                    path_args.append(default)
+            else:
+                path_args.append(args.pop(0))
+
+    return os.path.normpath(path.format(*path_args))
+
+
 class PathsJSON:
 
     def __init__(self, file_path=None, src_dir=None, target_name=".paths.json",
@@ -218,9 +254,7 @@ class PathsJSON:
             if enable_env_overrides:
                 data = patch_with_env(data)
 
-            if add_implicit_root and '_IMPLICIT_ROOT' not in data['__ENV']:
-                implicit_root = os.path.abspath(os.path.dirname(file_path))
-                data['__ENV']['_IMPLICIT_ROOT'] = implicit_root
+            inject_special_variables(data, file_path)
 
             if validate:
                 with open(SCHEMA_FILE) as fp:
@@ -237,27 +271,7 @@ class PathsJSON:
         return self.resolve_path(k, *args)
 
     def resolve_path(self, k, *args, **kwargs):
-        # Raises a key error which is a reasonable.
-        path, var_names, defaults = self._path_strs[k]
-
-        if not var_names:
-            return path
-
-        args, path_args = list(args), []
-        for name, default in zip(var_names, defaults):
-            if name in kwargs:
-                path_args.append(kwargs.pop(name))
-            else:
-                if not args:
-                    if default is None:
-                        expected = ", ".join(var_names)
-                        raise ValueError("Expected args: {}".format(expected))
-                    else:
-                        path_args.append(default)
-                else:
-                    path_args.append(args.pop(0))
-
-        return path.format(*path_args)
+        return resolve_path(self._path_strs, k, *args, **kwargs)
 
     def resolve(self, k, *args, **kwargs):
         return Resolution(self.resolve_path(k, *args, **kwargs))
