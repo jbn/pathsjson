@@ -76,7 +76,6 @@ def expand(data):
     data = copy.deepcopy(data)
 
     g = to_adjacency_list(data)
-    deps = to_dependents_list(g)
     ks = topo_sort(g, data['__ENV'])
     ns = data.pop('__ENV', {})
     expansion = {}
@@ -94,11 +93,16 @@ def expand(data):
         ns[k] = path
         expansion[k] = ns[k]
 
-    return expansion
+    sorted_expansion = OrderedDict()
+    for k in data:
+        if k in expansion:
+            sorted_expansion[k] = expansion[k]
+
+    return sorted_expansion
 
 
 def to_path_strs(expansion):
-    path_strs = {}
+    path_strs = OrderedDict()
 
     for k, path in expansion.items():
         parts, default_args, arg_names = [], [], []
@@ -175,7 +179,7 @@ def create_user_globals_file(overwrite=False):
 def patch_with_user_globals(data, skip_noexist=True):
     file_path = get_user_globals_path()
     if not skip_noexist and not os.path.exists(file_path):
-        raise OSError("User globals missing at: ".format(file_path))
+        raise IOError("User globals missing at: ".format(file_path))
 
     with open(file_path) as fp:
         global_data = json.load(fp, object_pairs_hook=OrderedDict)
@@ -200,7 +204,7 @@ class PathsJSON:
         if file_path is None:
             file_path = find_file_asc(src_dir, target_name)
             if file_path is None:
-                raise RuntimeError("No `{}` file found!".format(target_name))
+                raise IOError("No `{}` file found!".format(target_name))
 
         with open(file_path) as fp:
             data = json.load(fp, object_pairs_hook=OrderedDict)
@@ -233,8 +237,8 @@ class PathsJSON:
         return self.resolve_path(k, *args)
 
     def resolve_path(self, k, *args, **kwargs):
-        # Raises a lookup error which is a reasonable.
-        path, var_names, defaults = self._path_strs.get(k)
+        # Raises a key error which is a reasonable.
+        path, var_names, defaults = self._path_strs[k]
 
         if not var_names:
             return path
@@ -260,7 +264,7 @@ class PathsJSON:
 
     @property
     def all_resolvable_paths(self):
-        paths = {}
+        paths = OrderedDict()
         for k in self._path_strs:
             try:
                 paths[k] = self.resolve_path(k)
@@ -277,6 +281,7 @@ class PathsJSON:
 
 
 class Resolution:
+
     def __init__(self, path):
         self._path = path
 

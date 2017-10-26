@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import uuid
 import unittest
 from contextlib import contextmanager
 
@@ -8,7 +9,7 @@ from pathsjson.impl import *
 
 
 ###############################################################################
-# With some self-referential comedy, this is exactly the type of header that 
+# With some self-referential comedy, this is exactly the type of header that
 # paths.json removes from your code.
 ###############################################################################
 
@@ -32,7 +33,8 @@ def override_env(**kwargs):
     try:
         yield
     finally:
-        os.environ = kwargs
+        os.environ = old_env
+
 
 @contextmanager
 def delete_and_replace(path):
@@ -48,11 +50,8 @@ def delete_and_replace(path):
     else:
         yield
 
-
-
-
-
 ###############################################################################
+
 
 class TestPathsJSONFunctions(unittest.TestCase):
 
@@ -135,7 +134,6 @@ class TestPathsJSONFunctions(unittest.TestCase):
         self.assertIsNone(find_file_asc(MOCK_LEAF, "test_target", 1))
 
         # Check that it stops at root.
-        import uuid
         rand_name = uuid.uuid4().hex
         self.assertIsNone(find_file_asc(MOCK_LEAF, rand_name))
 
@@ -161,7 +159,7 @@ class TestPathsJSONFunctions(unittest.TestCase):
         path = get_user_globals_path()
 
         with delete_and_replace(path):
-            with self.assertRaisesRegexp(OSError, "User globals missing"):
+            with self.assertRaisesRegexp(IOError, "User globals missing"):
                 patch_with_user_globals({}, skip_noexist=False)
 
             expected = {'__ENV': {'ME': 'JBN'}, 'EXTRAS': '/extras'}
@@ -169,7 +167,8 @@ class TestPathsJSONFunctions(unittest.TestCase):
             with open(path, 'w') as fp:
                 json.dump(expected, fp)
 
-            self.assertEqual(patch_with_user_globals({}), expected)
+            self.assertEqual(patch_with_user_globals({'__ENV': {'ME': "OLD"}}),
+                             expected)
 
 
 class TestPathsJSON(unittest.TestCase):
@@ -178,6 +177,13 @@ class TestPathsJSON(unittest.TestCase):
         self.PATHS = PathsJSON(src_dir=FIXTURES_DIR,
                                target_name="sample.paths.json",
                                enable_user_global_overrides=False)
+
+    def test_bad_file_path(self):
+        with self.assertRaises(IOError):
+            PathsJSON(file_path=uuid.uuid4().hex)
+
+        with self.assertRaisesRegexp(IOError, "file found"):
+            PathsJSON(src_dir=MOCK_LEAF, target_name=uuid.uuid4().hex)
 
     def test_simple_path(self):
         self.assertEqual(self.PATHS['clean_dir'],
@@ -201,19 +207,43 @@ class TestPathsJSON(unittest.TestCase):
 
     def test_repr(self):
         expected = ("PathsJSON(KEYS=[clean_dir, codebook_dir, data_dir, "
-                   "latest_data, raw_dir, test_dir])")
+                    "latest_data, raw_dir, test_dir])")
         self.assertEqual(repr(self.PATHS), expected)
 
     def test_implicit_root(self):
-        expected = FIXTURES_DIR
         self.assertEqual(self.PATHS._src['__ENV']['_IMPLICIT_ROOT'],
                          FIXTURES_DIR)
 
     def test_order_preservation(self):
-        expected = ['__ENV', 'data_dir', 'raw_dir', 'test_dir', 'clean_dir', 
+        expected = ['data_dir', 'raw_dir', 'test_dir', 'clean_dir',
                     'latest_data', 'codebook_dir']
-        self.assertEqual(list(self.PATHS._src), expected)
+        self.assertEqual(list(self.PATHS.all_resolvable_paths), expected)
 
+    def test_works_without__env(self):
+        file_path = os.path.join(FIXTURES_DIR, "paths_without_env.json")
+        PATHS = PathsJSON(file_path=file_path)
+        self.assertIn('__ENV', PATHS._src)
+
+    def test_patch_with_user_globals(self):
+        path = get_user_globals_path()
+
+        with delete_and_replace(path):
+            expected = {'__ENV': {'VERSION': '0'},
+                        'data_dir': ['root'],
+                        'EXTRAS': ['extras']}
+            create_user_globals_file()
+            with open(path, 'w') as fp:
+                json.dump(expected, fp)
+
+            PATHS = PathsJSON(src_dir=FIXTURES_DIR,
+                              target_name="sample.paths.json")
+            self.assertEqual(PATHS['data_dir'], 'root')
+            self.assertEqual(PATHS['latest_data'],
+                             os.path.join('root', 'raw', '0', 'data.csv'))
+
+    def test_raises_key_error_on_non_existant_path(self):
+        with self.assertRaises(KeyError):
+            self.PATHS['missing']
 
 
 if __name__ == '__main__':
