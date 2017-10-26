@@ -209,6 +209,11 @@ class TestPathsJSON(unittest.TestCase):
         self.assertEqual(self.PATHS._src['__ENV']['_IMPLICIT_ROOT'],
                          FIXTURES_DIR)
 
+    def test_order_preservation(self):
+        expected = ['__ENV', 'data_dir', 'raw_dir', 'test_dir', 'clean_dir', 
+                    'latest_data', 'codebook_dir']
+        self.assertEqual(list(self.PATHS._src), expected)
+
 
 
 if __name__ == '__main__':

@@ -1,29 +1,9 @@
 {
-    "clean_dir": [
-        "$data_dir",
-        "clean"
-    ],
-    "raw_dir": [
-        "$data_dir",
-        "raw"
-    ],
-    "latest_data": [
-        "$raw_dir",
-        "$$VERSION",
-        "data.csv"
-    ],
-    "test_dir": [
-        "$data_dir",
-        "tests"
-    ],
-    "__ENV": {
-        "VERSION": "1.0.0"
-    },
-    "data_dir": [
-        "data"
-    ],
-    "codebook_dir": [
-        "$clean_dir",
-        "codebooks"
-    ]
+    "__ENV": { "VERSION": "1.0.0" },
+    "data_dir": [ "data" ],
+    "raw_dir": [ "$data_dir", "raw" ],
+    "test_dir": [ "$data_dir", "tests" ],
+    "clean_dir": [ "$data_dir", "clean" ],
+    "latest_data": [ "$raw_dir", "$$VERSION", "data.csv" ],
+    "codebook_dir": [ "$clean_dir", "codebooks" ]
 }

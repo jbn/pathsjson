@@ -3,6 +3,7 @@ import copy
 import json
 import jsonschema
 import os
+from collections import OrderedDict
 from contextlib import contextmanager
 
 
@@ -177,7 +178,7 @@ def patch_with_user_globals(data, skip_noexist=True):
         raise OSError("User globals missing at: ".format(file_path))
 
     with open(file_path) as fp:
-        global_data = json.load(fp)
+        global_data = json.load(fp, object_pairs_hook=OrderedDict)
 
     env_updates = global_data.pop('__ENV', None)
     if env_updates:
@@ -202,7 +203,7 @@ class PathsJSON:
                 raise RuntimeError("No `{}` file found!".format(target_name))
 
         with open(file_path) as fp:
-            data = json.load(fp)
+            data = json.load(fp, object_pairs_hook=OrderedDict)
 
             if '__ENV' not in data:
                 data['__ENV'] = {}
