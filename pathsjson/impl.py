@@ -236,7 +236,7 @@ class PathsJSON:
 
     def __init__(self, file_path=None, src_dir=None, target_name=".paths.json",
                  enable_env_overrides=True, enable_user_global_overrides=True,
-                 add_implicit_root=True, validate=True):
+                 validate=True):
         if file_path is None:
             file_path = find_file_asc(src_dir, target_name)
             if file_path is None:
@@ -245,7 +245,6 @@ class PathsJSON:
         self._file_path = file_path
         self._enable_env_overrides = enable_env_overrides
         self._enable_user_global_overrides = enable_user_global_overrides
-        self._add_implicit_root = add_implicit_root
         self._validate = validate
         self.reload()
 
@@ -253,7 +252,6 @@ class PathsJSON:
         file_path = self._file_path
         enable_env_overrides = self._enable_env_overrides
         enable_user_global_overrides = self._enable_user_global_overrides
-        add_implicit_root = self._add_implicit_root
         validate = self._validate
 
         with open(file_path) as fp:
