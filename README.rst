@@ -65,6 +65,12 @@ Then, from your python script,
     with open(PATHS['SOMETHING_CSV']) as fp:
         write_csv(fp)
 
+Installation
+------------
+.. code:: bash
+
+    pip install pathsjson
+
 More details
 ------------
 

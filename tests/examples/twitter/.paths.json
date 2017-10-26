@@ -1,0 +1,13 @@
+{
+    "__ENV": {
+        "VERSION": "0.0.1"
+    },
+    "data_dir": ["$$_IMPLICIT_ROOT", "data"],
+    "raw_dir": ["$data_dir", "raw"],
+    "log_dir": ["$data_dir", "logs"],
+    "clean_dir": ["$data_dir", "clean"],
+    
+    "twitter_errors": ["$log_dir", "$$VERSION", "twitter.log"],
+    "tweets": ["$raw_dir", "$$VERSION", "tweets.jsonl"],
+    "extract": ["$clean_dir", "$$VERSION", "extract.jsonl"]
+}
