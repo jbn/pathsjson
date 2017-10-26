@@ -242,6 +242,20 @@ class PathsJSON:
             if file_path is None:
                 raise IOError("No `{}` file found!".format(target_name))
 
+        self._file_path = file_path
+        self._enable_env_overrides = enable_env_overrides
+        self._enable_user_global_overrides = enable_user_global_overrides
+        self._add_implicit_root = add_implicit_root
+        self._validate = validate
+        self.reload()
+
+    def reload(self):
+        file_path = self._file_path
+        enable_env_overrides = self._enable_env_overrides
+        enable_user_global_overrides = self._enable_user_global_overrides
+        add_implicit_root = self._add_implicit_root
+        validate = self._validate
+
         with open(file_path) as fp:
             data = json.load(fp, object_pairs_hook=OrderedDict)
 
@@ -261,6 +275,8 @@ class PathsJSON:
                     jsonschema.validate(data, json.load(fp))
             self._src = data
             self._path_strs = to_path_strs(expand(data))
+
+        return self
 
     def __getitem__(self, args):
         if isinstance(args, tuple):

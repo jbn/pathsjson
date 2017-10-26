@@ -37,6 +37,7 @@ def override_env(**kwargs):
         os.environ = old_env
 
 
+# XXX: Add to vaquero
 @contextmanager
 def delete_and_replace(path):
     if os.path.exists(path):
@@ -262,6 +263,19 @@ class TestPathsJSON(unittest.TestCase):
         PATHS = PathsJSON(src_dir=FIXTURES_DIR,
                           target_name="paths_with_null_default.json")
 
+    def test_reloading(self):
+        example_path = os.path.join(MOCK_LEAF, "reloading.json")
+
+        with delete_and_replace(example_path):
+            with open(example_path, "w") as fp:
+                json.dump({"ref": ["original"]}, fp)
+            PATHS = PathsJSON(example_path)
+            self.assertEqual(PATHS["ref"], "original")
+
+            with open(example_path, "w") as fp:
+                json.dump({"ref": ["modified"]}, fp)
+            PATHS.reload()
+            self.assertEqual(PATHS["ref"], "modified")
 
 if __name__ == '__main__':
     unittest.main()
