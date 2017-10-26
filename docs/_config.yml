@@ -1,1 +1,7 @@
+title: pathsjson
+author: John Bjorn Nelson
+twitter:
+    username: generativist
 theme: jekyll-theme-minimal
+plugins:
+ - jekyll-seo-tag
