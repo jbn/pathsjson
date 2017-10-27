@@ -24,6 +24,8 @@ SAMPLE_PATH = os.path.join(FIXTURES_DIR, "sample.paths.json")
 
 SAMPLE_DATA = json.load(open(SAMPLE_PATH))
 
+TWITTER_DIR = os.path.join(SELF_DIR, "examples", "twitter")
+
 ###############################################################################
 
 
@@ -274,8 +276,9 @@ class TestPathsJSON(unittest.TestCase):
 
             with open(example_path, "w") as fp:
                 json.dump({"ref": ["modified"]}, fp)
-            PATHS.reload()
-            self.assertEqual(PATHS["ref"], "modified")
+
+            self.assertEqual(PATHS.reload()["ref"], "modified")
+
 
 if __name__ == '__main__':
     unittest.main()
