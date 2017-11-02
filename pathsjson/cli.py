@@ -16,6 +16,10 @@ def main(args=None):
                         action='store_true',
                         help='Print exports for shell')
 
+    parser.add_argument('--make-exports',
+                        action='store_true',
+                        help='Print exports for Makefile eval')
+
     parser.add_argument('--init-globals',
                         action='store_true',
                         help='Create the global paths.json file')
@@ -35,6 +39,14 @@ def main(args=None):
 
         for k, v in PATHS.all_resolvable_paths.items():
             print('export {}="{}"'.format(k, v))
+        sys.exit(0)
+
+    # https://stackoverflow.com/questions/16656789/import-environment-settings-into-makefile-ubuntu-and-osx
+    if args.make_exports:
+        from pathsjson.automagic import PATHS
+
+        for k, v in PATHS.all_resolvable_paths.items():
+            print('{}?={}'.format(k, v))
         sys.exit(0)
 
     if args.init_globals:
