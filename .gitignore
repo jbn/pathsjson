@@ -3,3 +3,5 @@ dist/
 *.pyc
 *.ipynb
 *.egg-info
+cli_tests/outputs
+.coverage

@@ -1,0 +1,6 @@
+export clean_dir="data/clean"
+export raw_dir="data/raw"
+export latest_data="data/raw/1.0.0/data.csv"
+export test_dir="data/tests"
+export data_dir="data"
+export codebook_dir="data/clean/codebooks"

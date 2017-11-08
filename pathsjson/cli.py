@@ -5,7 +5,7 @@ import sys
 from pathsjson.impl import *
 
 
-def main(args=None):
+def _main(args=None):
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--print-global-path',
@@ -58,8 +58,19 @@ def main(args=None):
             raise OSError(".paths.json already exists!")
 
         with open(".paths.json", "w") as fp:
-            json.dump({"__ENV": {}}, fp, indent="    ")
+            json.dump({"__ENV": {}}, fp, indent=4)
             sys.exit()
 
-
     parser.print_help()
+
+
+def main(args=None):
+    try:
+        _main(args)
+    except (IOError, RuntimeError) as e:
+        print(e)
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

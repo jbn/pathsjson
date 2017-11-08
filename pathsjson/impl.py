@@ -178,8 +178,11 @@ def create_user_globals_file(overwrite=False):
 
 def patch_with_user_globals(data, skip_noexist=True):
     file_path = get_user_globals_path()
-    if not skip_noexist and not os.path.exists(file_path):
-        raise IOError("User globals missing at: ".format(file_path))
+    if not os.path.exists(file_path):
+        if skip_noexist:
+            return data
+        else:
+            raise IOError("User globals missing at: ".format(file_path))
 
     with open(file_path) as fp:
         global_data = json.load(fp, object_pairs_hook=OrderedDict)
@@ -246,9 +249,13 @@ class PathsJSON:
         self._enable_env_overrides = enable_env_overrides
         self._enable_user_global_overrides = enable_user_global_overrides
         self._validate = validate
+
         self.reload()
 
     def reload(self):
+        """
+        Reload the path definitions.
+        """
         file_path = self._file_path
         enable_env_overrides = self._enable_env_overrides
         enable_user_global_overrides = self._enable_user_global_overrides

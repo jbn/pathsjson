@@ -52,7 +52,11 @@ def delete_and_replace(path):
             with open(path, "w") as fp:
                 fp.write(src)
     else:
-        yield
+        try:
+            yield
+        finally:
+            if os.path.exists(path):
+                os.unlink(path)
 
 ###############################################################################
 
