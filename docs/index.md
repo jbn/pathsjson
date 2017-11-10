@@ -163,6 +163,13 @@ There is a `.paths.json`
 [schema](http://pathsjson.falsifiable.com/schema.json#). 
 It's validated with [JSON-Schema](http://json-schema.org/).
 
+## Conventions
+
+I tend to use CAPITAL_CASE for all the pathsjson definitions. In you code, 
+they should look like constants. Or, at least, they should act as constants 
+in you code, and you outsource changes to the paths.json file. This also has 
+the added bonus of making `grep` or `sed` tasks easier. 
+
 ## Implementations
 
 The [reference implementation](https://github.com/jbn/pathsjson) is in python.
