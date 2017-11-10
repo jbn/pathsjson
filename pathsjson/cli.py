@@ -5,7 +5,7 @@ import sys
 from pathsjson.impl import *
 
 
-def _main(args=None):
+def extract_command(args):
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--print-global-path',
@@ -30,9 +30,17 @@ def _main(args=None):
 
     args = parser.parse_args(args)
 
-    if args.print_global_path:
+    n_set = sum(getattr(args, k) for k in dir(args) if not k.startswith('_'))
+
+    if args.print_global_path or n_set > 1:
         print(get_user_globals_path())
         sys.exit(0)
+
+    return args
+
+
+def _main(args=None):
+    args = extract_command(args)
 
     if args.shell_exports:
         from pathsjson.automagic import PATHS

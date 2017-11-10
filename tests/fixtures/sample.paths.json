@@ -1,9 +1,9 @@
 {
     "__ENV": { "VERSION": "1.0.0" },
-    "data_dir": [ "data" ],
-    "raw_dir": [ "$data_dir", "raw" ],
-    "test_dir": [ "$data_dir", "tests" ],
-    "clean_dir": [ "$data_dir", "clean" ],
-    "latest_data": [ "$raw_dir", "$$VERSION", "data.csv" ],
-    "codebook_dir": [ "$clean_dir", "codebooks" ]
+    "DATA_DIR": [ "data" ],
+    "RAW_DIR": [ "$DATA_DIR", "raw" ],
+    "TEST_DIR": [ "$DATA_DIR", "tests" ],
+    "CLEAN_DIR": [ "$DATA_DIR", "clean" ],
+    "LATEST_DATA": [ "$RAW_DIR", "$$VERSION", "data.csv" ],
+    "CODEBOOK_DIR": [ "$CLEAN_DIR", "codebooks" ]
 }

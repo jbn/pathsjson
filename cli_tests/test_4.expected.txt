@@ -1,6 +1,6 @@
-clean_dir?=data/clean
-raw_dir?=data/raw
-latest_data?=data/raw/1.0.0/data.csv
-test_dir?=data/tests
-data_dir?=data
-codebook_dir?=data/clean/codebooks
+CLEAN_DIR?=data/clean
+RAW_DIR?=data/raw
+LATEST_DATA?=data/raw/1.0.0/data.csv
+TEST_DIR?=data/tests
+DATA_DIR?=data
+CODEBOOK_DIR?=data/clean/codebooks

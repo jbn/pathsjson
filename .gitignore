@@ -1,7 +1,7 @@
-.ipynb_checkpoints/
-dist/
-*.pyc
-*.ipynb
 *.egg-info
-cli_tests/outputs
+*.ipynb
+*.pyc
 .coverage
+.ipynb_checkpoints/
+cli_tests/outputs
+dist/

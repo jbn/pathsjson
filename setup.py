@@ -15,7 +15,9 @@ META_PATH = os.path.join("pathsjson", "__init__.py")
 KEYWORDS = ["data analysis", "data science", "elt"]
 
 CLASSIFIERS = ["Development Status :: 3 - Alpha",
+               "Environment :: Console",
                "Intended Audience :: Science/Research",
+               "Intended Audience :: Developers",
                "Topic :: Scientific/Engineering :: Information Analysis",
                "License :: OSI Approved :: MIT License",
                "Programming Language :: Python :: 2.7",
@@ -23,7 +25,12 @@ CLASSIFIERS = ["Development Status :: 3 - Alpha",
                "Programming Language :: Python :: 3.2",
                "Programming Language :: Python :: 3.3",
                "Programming Language :: Python :: 3.4",
-               "Programming Language :: Python :: 3.5"]
+               "Programming Language :: Python :: 3.5",
+               "Programming Language :: Python :: 3.6",
+               "Topic :: Software Development :: Build Tools",
+               "Topic :: Software Development :: Code Generators",
+               "Topic :: System :: Filesystems",
+               "Topic :: Utilities"]
 
 INSTALL_REQUIRES = ['appdirs', 'jsonschema']
 

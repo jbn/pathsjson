@@ -2,12 +2,12 @@
     "__ENV": {
         "VERSION": "0.0.1"
     },
-    "data_dir": ["$$_IMPLICIT_ROOT", "data"],
-    "raw_dir": ["$data_dir", "raw"],
-    "log_dir": ["$data_dir", "logs"],
-    "clean_dir": ["$data_dir", "clean"],
+    "DATA_DIR": ["$$_IMPLICIT_ROOT", "data"],
+    "RAW_DIR": ["$DATA_DIR", "raw"],
+    "LOG_DIR": ["$DATA_DIR", "logs"],
+    "CLEAN_DIR": ["$DATA_DIR", "clean"],
     
-    "twitter_errors": ["$log_dir", "$$VERSION", "twitter.log"],
-    "tweets": ["$raw_dir", "$$VERSION", "tweets.jsonl"],
-    "extract": ["$clean_dir", "$$VERSION", "extract.jsonl"]
+    "TWITTER_ERRORS": ["$LOG_DIR", "$$VERSION", "twitter.log"],
+    "TWEETS": ["$RAW_DIR", "$$VERSION", "tweets.jsonl"],
+    "EXTRACT": ["$CLEAN_DIR", "$$VERSION", "extract.jsonl"]
 }
