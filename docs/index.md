@@ -110,13 +110,14 @@ When you install the reference implementation, it creates a console script
 `pathsjson` with the following usage:
 
 ```
-usage: pathsjson [-h] [--print-global-path] [--shell-exports] [--init-globals]
-                 [--init]
+usage: pathsjson [-h] [--print-global-path] [--shell-exports] [--make-exports]
+                 [--init-globals] [--init]
 
 optional arguments:
   -h, --help           show this help message and exit
   --print-global-path  Print global paths.json file path
   --shell-exports      Print exports for shell
+  --make-exports       Print exports for Makefile eval
   --init-globals       Create the global paths.json file
   --init               Create a .paths.json file in the cwd
 ```
@@ -126,6 +127,35 @@ you define user-level defaults. It's useful when you do contract work or
 group related projects onto one disk. For example, I may define a 
 `CONTRACT-99` directory in the global `paths.json` file. Then, all my 
 data goes onto a portable harddrive for that contract. 
+
+## Using with `Makefile`s
+
+The `pathsjson` cli lets you export a file that your `Makefile` can `include`.
+I'm sure there is a better way to do this -- and, if you know it, please 
+open a PR! -- but the following allows you use `paths.json` variables as
+variables in you `Makefile`.
+
+```Makefile
+include paths.mk
+
+all: paths.mk target1 target2
+
+###############################################################################
+# This is a hack, but for now it's the best solution. If the paths.mk file
+# needs a rebuild, the prior inclusion is wrong. The targets may depend on 
+# paths which have changed. This builds it, then errs. On the next invocation, 
+# it will run correctly.
+###############################################################################
+
+paths.mk: .paths.json
+        pathsjson --make-exports > paths.mk
+        @echo "paths.mk REBUILT\n\nRERUN MAKEFILE"
+        exit 1
+
+target1:
+    bin/python load_data.py $(VARIABLE_IN_PATHSJSON)
+```
+
 
 ## Validation
 

@@ -176,16 +176,22 @@ def create_user_globals_file(overwrite=False):
     return file_path
 
 
+def load_user_globals():
+    try:
+        with open(get_user_globals_path()) as fp:
+            return json.load(fp, object_pairs_hook=OrderedDict)
+    except IOError:
+        return None
+
+
 def patch_with_user_globals(data, skip_noexist=True):
-    file_path = get_user_globals_path()
-    if not os.path.exists(file_path):
+    global_data = load_user_globals()
+
+    if global_data is None:
         if skip_noexist:
             return data
         else:
-            raise IOError("User globals missing at: ".format(file_path))
-
-    with open(file_path) as fp:
-        global_data = json.load(fp, object_pairs_hook=OrderedDict)
+            raise IOError("Global data missing and skip_no_exist=False")
 
     env_updates = global_data.pop('__ENV', None)
     if env_updates:

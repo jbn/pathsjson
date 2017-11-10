@@ -179,7 +179,7 @@ class TestPathsJSONFunctions(unittest.TestCase):
         path = get_user_globals_path()
 
         with delete_and_replace(path):
-            with self.assertRaisesRegexp(IOError, "User globals missing"):
+            with self.assertRaisesRegexp(IOError, "Global data missing"):
                 patch_with_user_globals({}, skip_noexist=False)
 
             expected = {'__ENV': {'ME': 'JBN'}, 'EXTRAS': '/extras'}
