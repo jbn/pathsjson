@@ -29,21 +29,51 @@ class Path:
         return hash((self.path,) + self.arg_names + self.defaults)
 
     def resolve(self, *args, **kwargs):
-        if not self.arg_names:
+        """
+        Resolve the path for use including variable interpolation.
+
+        If there are too many parameter, resolution raises a TypeError
+        (just like a function with too many parameters would raise.)
+        Otherwise, it scans over the path arguments from left to right.
+        During the scan, if the argument name exists in the kwargs, it's
+        popped off from the kwargs. If there are more required arguments
+        than there are given arguments -- both keyword and positional --
+        it will try to use the defaults for all arguments prefixed with an
+        underscore.
+
+        :param args: positional arguments for interpolation
+        :param kwargs: keyword-based arguments for interpolation
+        :return: a path string
+        """
+        arg_names = self.arg_names
+        n_args_expected = len(arg_names)
+        if n_args_expected == 0:
             return self.path
 
-        args, path_args = list(args), []
-        for name, default in zip(self.arg_names, self.defaults):
-            if name in kwargs:
+        skip_func_args, n_args, path_args = set(), len(args) + len(kwargs), []
+
+        if n_args < len(arg_names):
+            name_strs = (x[0] if isinstance(x, list) else x for x in arg_names)
+            skip_func_args = {s for s in name_strs if s.startswith('_')}
+
+        args = list(args)
+
+        for name, default in zip(arg_names, self.defaults):
+            skip = name in skip_func_args
+
+            if not skip and name in kwargs:
                 path_args.append(kwargs.pop(name))
+            elif not skip and args:
+                path_args.append(args.pop(0))
             else:
-                if not args:
-                    if default is None:
-                        expected = ", ".join(self.arg_names)
-                        raise ValueError("Expected args: {}".format(expected))
-                    else:
-                        path_args.append(default)
+                if default is None:
+                    expected = ", ".join(arg_names)
+                    raise TypeError("Expected args: {}".format(expected))
                 else:
-                    path_args.append(args.pop(0))
+                    path_args.append(default)
+
+        if args or kwargs:
+            expected = ", ".join(arg_names)
+            raise TypeError("Too many args. Expected: {}".format(expected))
 
         return os.path.normpath(self.path.format(*path_args))
