@@ -156,6 +156,10 @@ target1:
     bin/python load_data.py $(VARIABLE_IN_PATHSJSON)
 ```
 
+(I'd prefer a solution that just included the output of the cli call so it's
+always fresh and you don't need to liter your directory with build artifacts.
+But, the few I tried didn't work well. I also want to figue out how to ignore
+some variables on zsh Makefile completion.)
 
 ## Validation
 
@@ -165,10 +169,10 @@ It's validated with [JSON-Schema](http://json-schema.org/).
 
 ## Conventions
 
-I tend to use CAPITAL_CASE for all the pathsjson definitions. In you code, 
-they should look like constants. Or, at least, they should act as constants 
-in you code, and you outsource changes to the paths.json file. This also has 
-the added bonus of making `grep` or `sed` tasks easier. 
+- I tend to use CAPITAL_CASE for all the pathsjson definitions. In you code, 
+  they should look like constants. Or, at least, they should act as constants 
+  in you code, and you outsource changes to the paths.json file. This also has 
+  the added bonus of making `grep` or `sed` tasks easier. 
 
 ## Implementations
 
