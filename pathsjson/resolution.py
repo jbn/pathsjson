@@ -32,7 +32,7 @@ class Resolution:
         :param args: passed to open
         :param kwargs: passed to open
         """
-        dir_path = os.path.dirname(self._path)
+        dir_path = os.path.dirname(self.path_str)
 
         if not os.path.exists(dir_path):
             try:
@@ -40,5 +40,5 @@ class Resolution:
             except OSError:
                 pass
 
-        with open(self._path, *args, **kwargs) as fp:
+        with open(self.path_str, *args, **kwargs) as fp:
             yield fp

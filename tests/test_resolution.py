@@ -1,5 +1,7 @@
+import shutil
 import unittest
 from pathsjson.resolution import Resolution
+from tests import *
 
 
 class TestResolution(unittest.TestCase):
@@ -24,3 +26,27 @@ class TestResolution(unittest.TestCase):
         c = Resolution("another/path")
         self.assertEqual(a, b)
         self.assertNotEqual(a, c)
+
+    def test_open(self):
+        test_dir = os.path.join(SELF_DIR, "fake_env", "open_dir")
+        test_path = os.path.join(test_dir, "target.txt")
+
+        try:
+            resolution = Resolution(test_path)
+            self.assertFalse(os.path.exists(test_dir))
+
+            msg = "hello world"
+            with resolution.open("w") as fp:
+                fp.write(msg)
+
+            with resolution.open("r") as fp:
+                self.assertEqual(fp.read(), msg)
+
+            msg = "goodbye world"
+            with resolution.open("w") as fp:
+                fp.write(msg)
+
+            with resolution.open("r") as fp:
+                self.assertEqual(fp.read(), msg)
+        finally:
+            shutil.rmtree(test_dir)
