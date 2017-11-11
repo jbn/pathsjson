@@ -75,7 +75,7 @@ def _main(args=None):
 def main(args=None):
     try:
         _main(args)
-    except (IOError, RuntimeError) as e:
+    except Exception as e:
         print(e)
         sys.exit(1)
 
