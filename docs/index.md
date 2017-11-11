@@ -172,7 +172,10 @@ It's validated with [JSON-Schema](http://json-schema.org/).
 - I tend to use CAPITAL_CASE for all the pathsjson definitions. In you code, 
   they should look like constants. Or, at least, they should act as constants 
   in you code, and you outsource changes to the paths.json file. This also has 
-  the added bonus of making `grep` or `sed` tasks easier. 
+  the added bonus of making `grep` or `sed` tasks easier. And, for an added,
+  added bonus -- it's perceptually noticable as "non literal", giving 
+  something akin to syntax highlighting without writing the highlighter
+  definitions.
 
 ## Implementations
 
