@@ -15,12 +15,12 @@
 What is this?
 =============
 
-A JSON-based format for describing paths in your project.
+A JSON-based DSL for describing paths in your project.
 
 Why is this?
-------------
+~~~~~~~~~~~~
 
-My etl/data analysis scripts are littered with code like,
+My etl/data analysis projects are littered with code like,
 
 .. code:: python
 
@@ -41,28 +41,30 @@ My etl/data analysis scripts are littered with code like,
 It's fine for one file, but when you have a whole ELT pipeline tucked
 into a ``Makefile``, the duplication leads to fragility and violates
 DRY. It's a **REALLY** common pattern in file-based processing. This
-package and format lets you do create a ``paths.json`` file like,
+package and format lets you do create a ``.paths.json`` file like,
 
 .. code:: json
 
     {
-        "DATA_DIR": ["data"],
+        "__ENV": {"VERSION": "0.0.1"},
+        "DATA_DIR": ["data", "$$VERSION"],
         "CLEAN_DIR": ["$DATA_DIR", "clean"],
         "RAW_DIR": ["$DATA_DIR", "raw"],
         "SOMETHING_HTML": ["$RAW_DIR", "something.html"],
         "SOMETHING_CSV": ["$RAW_DIR", "something.csv"]
     }
 
-Then, from your python script,
+Then, from your python scripts,
 
 .. code:: python
 
     from pathsjson.automagic import PATHS
 
-    with open(PATHS['SOMETHING_HTML']) as fp:
+    print("Processing:", PATHS['SOMETHING_HTML'])
+    with PATHS.resolve('SOMETHING_HTML').open() as fp:
         csv = process(fp)
 
-    with open(PATHS['SOMETHING_CSV']) as fp:
+    with PATHS.resolve('SOMETHING_CSV').open("w") as fp:
         write_csv(fp)
 
 Installation
@@ -70,6 +72,14 @@ Installation
 .. code:: bash
 
     pip install pathsjson
+
+
+Validation
+----------
+
+There is a ``.paths.json`` 
+`schema <http://pathsjson.falsifiable.com/schema.json#>`_. 
+It's validated with `JSON-Schema <http://json-schema.org/>`_.
 
 More details
 ------------

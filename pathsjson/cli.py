@@ -8,6 +8,18 @@ from pathsjson.impl import *
 def extract_command(args):
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--init',
+                        action='store_true',
+                        help='Create a .paths.json file in the cwd')
+
+    parser.add_argument('--init-globals',
+                        action='store_true',
+                        help='Create the global paths.json file')
+
+    parser.add_argument('--make-exports',
+                        action='store_true',
+                        help='Print exports for Makefile eval')
+
     parser.add_argument('--print-global-path',
                         action='store_true',
                         help='Print global paths.json file path')
@@ -16,17 +28,7 @@ def extract_command(args):
                         action='store_true',
                         help='Print exports for shell')
 
-    parser.add_argument('--make-exports',
-                        action='store_true',
-                        help='Print exports for Makefile eval')
 
-    parser.add_argument('--init-globals',
-                        action='store_true',
-                        help='Create the global paths.json file')
-
-    parser.add_argument('--init',
-                        action='store_true',
-                        help='Create a .paths.json file in the cwd')
 
     args = parser.parse_args(args)
 

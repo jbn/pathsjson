@@ -1,6 +1,7 @@
 *.egg-info
 *.ipynb
 *.pyc
+.DS_Store
 .coverage
 .ipynb_checkpoints/
 cli_tests/outputs

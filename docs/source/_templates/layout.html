@@ -1,0 +1,12 @@
+{% extends "!layout.html" %}
+
+{% block htmltitle %}
+    {{ super() }}
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:creator" content="@generativist" />
+    <meta property="og:url" content="http://pathsjson.falsifiable.com/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="PathsJSON" />
+    <meta property="og:description" content="A JSON-based format for describing paths in your project." />
+    <meta property="og:image" content="http://pathsjson.falsifiable.com/_static/pathsjson_card_image.png" />
+{% endblock %}
