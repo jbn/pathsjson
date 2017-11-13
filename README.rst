@@ -38,7 +38,7 @@ My etl/data analysis projects are littered with code like,
     with open(OUTPUT_FILE) as fp:
         write_csv(fp)
 
-It's fine for one file, but when you have a whole ELT pipeline tucked
+It's fine for one file, but when you have a whole ETL pipeline tucked
 into a ``Makefile``, the duplication leads to fragility and violates
 DRY. It's a **REALLY** common pattern in file-based processing. This
 package and format lets you do create a ``.paths.json`` file like,
