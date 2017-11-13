@@ -1,5 +1,5 @@
-Welcome to Paths.JSON's documentation!
-======================================
+Welcome to PathsJSON's documentation!
+=====================================
 
 .. include:: ../../README.rst 
 
